@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				background: url(img/u=891144672,1608736866&fm=27&gp=0.jpg);
+			}
+			.box {
+				height: 500px;
+				width: 1604px;
+				position: relative;
+				margin: 10px auto;
+				text-align: center;
+				font-size: 100px;
+				color: red;
+				background: url(img/t01144c6156e6e8a05d.jpg);
+				background-size: 1604px 500px;
+				overflow: hidden;
+			}
+			.box>.circle {
+				position: absolute;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				top: 440px;
+				background: url(img/t01fca406ffb7f08552.png);
+				background-size: 40px 40px;
+			}
+			.box>.block {
+				height: 20px;
+				width: 400px;
+				position: absolute;
+				top: 480px;
+				border-radius: 10px;
+				background: url(img/t01129a32116f9ccac4.jpg);
+			}
+			.box>.content {
+				width: 150px;
+				height: 50px;
+				position: absolute;
+				top: 205px;
+				left: 727px;
+				font-size: 25px;
+				color: greenyellow;
+			}
+			span {
+				display: block;
+				position: absolute;
+				left: 157px;
+				top: 0;
+				width: 350px;
+				height: 100px;
+				border: 1px solid white;
+				font-size: 60px;
+				line-height: 100px;
+				color: white;
+			}
+			span:nth-of-type(2) {
+				left: 508px;
+			}
+			span>p,span>nav{
+				float: right;
+			}
+			body>button {
+				display: block;
+				position: absolute;
+				left: 1630px;
+				width: 114px;
+				height: 114px;
+				border: 0;
+				border-radius: 50%;
+				font-size: 20px;
+				text-align: center;
+				line-height: 100px;
+				outline: 0;
+				color: white;
+				background: url(img/2Q==.jpg);
+				background-size: 150px 150px;
+				background-position: -21px -20px;
+			}
+			body>button:hover {
+				cursor: pointer;
+				color: pink;
+			}
+			h2 {
+				margin-left: 400px;
+				line-height: 500px;
+			}
+			section {
+				float: left;
+			}
+			input {
+				position: relative;
+				left: 1500px;
+				width: 114px;
+				height: 114px;
+				border: 0;
+				border-radius: 50%;
+				background: url(img/2Q==.jpg);
+				background-size: 150px 150px;
+				background-position: -21px -20px;
+				color: white;
+				font-size: 20px;
+				outline: 0;
+			}
+			input:hover {
+				cursor: pointer;
+				color: pink;
+			}
+			.speed{
+				width: 360px;
+				height: 114px;
+				position: absolute;
+				left: 1100px;
+			}
+			.speed>button{
+				width: 114px;
+				height: 114px;
+				border: 0;
+				border-radius: 50%;
+				font-size: 20px;
+				text-align: center;
+				line-height: 100px;
+				outline: 0;
+				color: white;
+				background: url(img/2Q==.jpg);
+				background-size: 150px 150px;
+				background-position: -21px -20px;
+			}
+			.speed>button:hover {
+				cursor: pointer;
+				color: pink;
+			}
+		</style>
+	</head>
+	<body>
+		<span>倒计时:<nav></nav></span>
+		<span>得分:<p></p></span>
+		<div class="speed">
+			<button class="topspeed">topspeed</button>
+			<button class="normal">normal</button>
+			<button class="lowspeed">lowspeed</button>
+		</div>
+		<button>start</button>
+		<input type="submit" value="mode" />
+		<div class="box">
+			<h2>
+				<section>乐</section>
+				<section>趣</section>
+				<section>打</section>
+				<section>砖</section>
+				<section>块</section>
+			</h2>
+			<ul></ul>
+			<div class="content"></div>
+			<div class="circle"></div>
+			<div class="block"></div>
+		</div>
+	</body>
+</html>
+<script>
+	function RNDColor() {
+		return Math.round(Math.random() * 255);
+	}
+	var section = document.querySelectorAll("section");
+	setInterval(function() {
+		for(var i = 0; i < section.length; i++) {
+			section[i].style.color = "rgb(" + RNDColor() + "," + RNDColor() + "," + RNDColor() + ")";
+		}
+	}, 500);
+	var date = null,
+		moveBall = null,
+		endless = null;
+	var block = document.querySelector(".block");
+	var blockXpos = 0;
+	function circleInit() {
+		this.ball = document.querySelector(".circle"); //运动对象
+		this.box = document.querySelector(".box");
+		this.liBox = document.querySelector("ul");
+		this.Xon = 1; //从左向右
+		this.Xpos = 0; //对象距离左边界的位置
+		this.Yon = 1; //从上到下
+		this.Ypos = 450; //对象距离上边界的位置
+		this.speed = 1;
+	}
+	circleInit.prototype.move = function() { //小球运动函数
+		this.ball.style.left = this.Xpos + "px"; //小球距离左边界的位置
+		this.ball.style.top = this.Ypos + "px"; //小球距离上边界的位置
+		if(this.Xon == 1) { //当小球从左往右走时
+			this.Xpos += this.speed; //距离越来越大
+		} else { //从右往左走时
+			this.Xpos -= this.speed; //距离越来越小
+		}
+		if(this.Xpos + this.ball.offsetWidth > this.box.offsetWidth) { //当小球走到最右边的时候
+			this.Xon = 0; //改变运动方向
+			this.Xpos = this.box.offsetWidth - this.ball.offsetWidth; //即将返回时的距离
+		}
+		if(this.Xpos < 0) { //当小球运动到最左边的时候
+			this.Xon = 1; //改变方向
+			this.Xpos = 0; //即将返回时的距离
+		}
+		if(this.Yon == 1) { //当小球从上往下走时
+			this.Ypos += this.speed; //距离越来越大
+		} else { //从下往上走时
+			this.Ypos -= this.speed; //距离越来越小
+		}
+		if(this.Xpos > blockXpos && this.Xpos + this.ball.offsetWidth < blockXpos + block.offsetWidth) {
+			if(this.Ypos + this.ball.offsetHeight >= this.box.offsetHeight - block.offsetHeight) { //当小球走到最下边的时候
+				this.Yon = 0; //改变运动方向
+				this.Ypos = this.box.offsetHeight - this.ball.offsetHeight - block.offsetHeight; //即将返回时的距离
+			}
+		}
+		if(this.Ypos + this.ball.offsetHeight > this.box.offsetHeight) { //当小球走到最下边的时候
+			this.Yon = 0; //改变运动方向
+			this.Ypos = this.box.offsetHeight - this.ball.offsetHeight; //即将返回时的距离
+		}
+		if(this.Ypos < 0) { //当小球运动到最上边的时候
+			this.Yon = 1; //改变方向
+			this.Ypos = 0; //即将返回时的距离
+		}
+		if(this.Ypos + this.ball.offsetHeight >= this.box.offsetHeight) {
+			this.box.innerHTML = "<h1 style='line-height: 500px;'>game over!</h1>";
+			this.box.value = "1";
+		}
+	}
+	var grade = 0;
+	circleInit.prototype.clearLi = function() {
+		var li = document.querySelectorAll("li");
+		var flag = true;
+		for(var i = 0; i < li.length; i++) {
+			if(this.Xpos >= li[i].offsetLeft && this.Xpos + this.ball.offsetWidth <= li[i].offsetLeft + li[i].offsetWidth) {
+				if(this.Ypos <= li[i].offsetTop + li[i].offsetHeight) {
+					this.Yon = 1;
+					li[i].style.display = "none";
+					if(li[i].style.backgroundColor == "red") {
+						document.querySelector(".content").innerText = "恭喜 +10 分!";
+						grade += 10;
+					} else if(li[i].style.backgroundColor == "blue") {
+						document.querySelector(".content").innerText = "恭喜 +20 分!";
+						grade += 20;
+					} else {
+						document.querySelector(".content").innerText = "";
+						grade++;
+					}
+					document.querySelector("p").innerText = grade;
+				}
+			}
+			if(li[i].style.display != "none") {
+				flag = false;
+			}
+		}
+		if(flag) {
+			this.box.innerHTML = "<h1 style='line-height: 500px;'>game over!</h1>";
+		}
+	}
+	var time = 60;
+	var liTop = 0;
+	var ball = new circleInit();
+	document.querySelector(".topspeed").onclick=function () {
+		ball.speed=2;
+	}
+	document.querySelector(".normal").onclick=function () {
+		ball.speed=1;
+	}
+	document.querySelector(".lowspeed").onclick=function () {
+		ball.speed=.5;
+	}
+	document.querySelector("body>button").onclick = function() {
+		if (this.innerText == "start" && document.querySelector(".box").value=="1") {
+			location="game.html";
+		}
+		if(this.innerText == "start" || this.innerText == "continue") {
+			this.innerText = "pause";
+			if(document.querySelector("h2").style.display != "none") {
+				circleInit.prototype.initLi = function(rows, cols) {
+					for(var i = -20; i < rows; i++) {
+						for(var j = 0; j < cols; j++) {
+							var li = document.createElement("li");
+							li.style.width = "160px";
+							li.style.height = "50px";
+							li.style.listStyle = "none";
+							li.style.position = "absolute";
+							li.style.left = j * 160 + "px";
+							li.style.top = i * 50 + "px";
+							li.style.border = "2px solid white";
+							li.style.borderRadius = "50px";
+							if(RNDColor() > 240) {
+								li.style.background = "blue";
+							} else if(RNDColor() > 200) {
+								li.style.background = "red";
+							} else {
+								li.style.background = "rgb(" + RNDColor() + "," + RNDColor() + "," + RNDColor() + ")";
+							}
+							this.liBox.appendChild(li);
+						}
+					}
+				}
+				ball.initLi(4, 10);
+			}
+			document.querySelector("h2").style.display = "none";
+			document.onkeydown = function(e) { //e是事件对象
+				if(e.keyCode == 39) { //挡板向右移动
+					blockXpos += 100;
+					if(blockXpos + block.offsetWidth > ball.box.offsetWidth) {
+						blockXpos = ball.box.offsetWidth - block.offsetWidth;
+					}
+					block.style.left = blockXpos + "px";
+				} else if(e.keyCode == 37) {
+					blockXpos -= 100;
+					if(blockXpos < 0) {
+						blockXpos = 0;
+					}
+				}
+				block.style.left = blockXpos + "px";
+			}
+			document.querySelector("nav").innerText = time;
+			date = setInterval(function() {
+				time--;
+				if(time == 0 || document.querySelector(".box").value == "1") {
+					clearInterval(moveBall);
+					clearInterval(date);
+					clearInterval(endless);
+					document.querySelector(".box").innerHTML = "<h1 style='line-height: 500px;'>game over!</h1>";
+					document.querySelector(".box").value = "1";
+					document.querySelector("body>button").innerText = "start";
+				}
+				document.querySelector("nav").innerText = time;
+			}, 1000);
+			moveBall = setInterval(function() {
+				ball.move(); //小球开始运动
+				ball.clearLi();
+			});
+			var count=0;
+			document.querySelector("input").onclick = function() {
+				if (count==0) {
+					var a = document.querySelectorAll("li");
+					endless = setInterval(function() {
+						liTop++;
+						var x = 0;
+						var max = 0;
+						for(var i = -20; i < 4; i++) {
+							for(var j = 0; j < 10; j++) {
+								a[x].style.top = i * 50 + liTop + "px";
+								if(a[x].style.display != "none") {
+									if(a[x].offsetTop + a[x].offsetHeight >= 500 - 40 - 20) {
+										clearInterval(date);
+										clearInterval(endless);
+										clearInterval(moveBall);
+										document.querySelector("body>button").innerText = "start";
+										document.querySelector(".box").innerHTML = "<h1 style='line-height: 500px;'>game over!</h1>";
+										document.querySelector(".box").value = "1";
+									}
+									if(a[x].offsetTop + a[x].offsetHeight > max) {
+										max = a[x].offsetTop + a[x].offsetHeight;
+									}
+								}
+								x++;
+							}
+						}
+						document.querySelector(".content").style.top = max + "px";
+					}, 100)
+					count++;
+				}else{
+					clearInterval(endless);
+					count--;
+				}
+			}
+		} else if(this.innerText == "pause") {
+			this.innerText = "continue";
+			clearInterval(date);
+			clearInterval(moveBall);
+			clearInterval(endless);
+		}
+	}
+</script>
